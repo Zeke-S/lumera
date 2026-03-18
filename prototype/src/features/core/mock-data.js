@@ -1,17 +1,9 @@
 export const VIDEO_SOURCES = {
   // 尽量使用浏览器可直接播放的公开测试视频；若加载失败，会自动回退到渐变背景
-  rain: [
-    "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  ],
-  lab: [
-    "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  ],
-  cosmos: [
-    "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  ],
-  blackboard: [
-    "https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4",
-  ],
+  rain: ["https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"],
+  lab: ["https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"],
+  cosmos: ["https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"],
+  blackboard: ["https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4"],
 };
 
 export const DEFAULT_TRUTH_ANCHOR = "a^2 + b^2 = c^2";

@@ -1,30 +1,22 @@
 import {
-  ASSETS,
   BRANCHES,
   DEFAULT_STRATEGY,
   DEFAULT_TRUTH_ANCHOR,
-  PROJECTS,
   RENDER_JOBS,
   STORYBOARD,
   VERSIONS,
   VIDEO_SOURCES,
   makeLkmpRun,
-} from "./data.js";
-
-const $ = (sel, root = document) => root.querySelector(sel);
-
-const shell = {
-  pageTitle: $("#pageTitle"),
-  pageSubtitle: $("#pageSubtitle"),
-  viewRoot: $("#viewRoot"),
-  toggleAssets: $("#toggleAssets"),
-  assetsDrawer: $("#assetsDrawer"),
-  closeAssets: $("#closeAssets"),
-  assetList: $("#assetList"),
-  toggleBranchingMap: $("#toggleBranchingMap"),
-};
+} from "../features/core/mock-data.js";
+import { $, htmlEscape } from "../lib/dom.js";
+import { applyHeader, ensureHashRoute, routeFromHash, setNavActive } from "./router.js";
+import { getShellRefs, openAssets } from "./shell.js";
+import { renderAssets } from "../features/assets/render-assets.js";
+import { renderProjectsPage } from "../features/projects/render-projects-page.js";
 
 const sceneLabels = { blackboard: "黑板", lab: "实验室", cosmos: "宇宙", rain: "雨夜" };
+
+const shell = getShellRefs();
 
 let appState = {
   route: "workbench",
@@ -53,108 +45,10 @@ function normalizeWeights() {
   appState.narrativeWeight = n / sum;
 }
 
-function setHeader(title, subtitle) {
-  shell.pageTitle.textContent = title;
-  shell.pageSubtitle.textContent = subtitle;
-}
-
-function setNavActive(route) {
-  document.querySelectorAll(".navItem").forEach((a) => {
-    a.classList.toggle("active", a.dataset.route === route);
-  });
-}
-
-function openAssets(open) {
-  shell.assetsDrawer.hidden = !open;
-}
-
-function renderAssets() {
-  shell.assetList.innerHTML = "";
-  for (const a of ASSETS) {
-    const el = document.createElement("div");
-    el.className = "assetItem";
-    el.innerHTML = `
-      <div class="assetName">${a.name}</div>
-      <div class="assetMeta">${a.meta}</div>
-    `;
-    shell.assetList.appendChild(el);
-  }
-}
-
-function routeFromHash() {
-  const h = (location.hash || "").replace(/^#\/?/, "");
-  const r = h.split("?")[0].trim();
-  return r || "workbench";
-}
-
-function htmlEscape(s) {
-  return String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-}
-
-function renderProjectsPage() {
-  setHeader("项目", "项目列表 / 新建项目（原型占位）");
-  const rows = PROJECTS.map((p) => {
-    const status = p.status === "active" ? "ok" : p.status === "draft" ? "run" : "fail";
-    return `
-      <div class="row">
-        <div class="rowMain">
-          <div class="rowTitle">${htmlEscape(p.name)}</div>
-          <div class="rowDesc">${htmlEscape(p.desc)}</div>
-          <div class="rowDesc">${htmlEscape(p.updatedAt)}</div>
-        </div>
-        <div class="rowRight">
-          <span class="status ${status}">${htmlEscape(p.status)}</span>
-          <button class="btn btnPrimary" type="button" data-open-project="${htmlEscape(p.id)}">打开</button>
-        </div>
-      </div>
-    `;
-  }).join("");
-
-  shell.viewRoot.innerHTML = `
-    <section class="page">
-      <div class="grid2">
-        <div class="panel">
-          <div class="panelTitle2">我的项目</div>
-          <div class="list">${rows}</div>
-        </div>
-        <div class="panel">
-          <div class="panelTitle2">快速创建（占位）</div>
-          <div class="list">
-            <div class="row">
-              <div class="rowMain">
-                <div class="rowTitle">从意图生成</div>
-                <div class="rowDesc">输入一句话 → 自动生成分镜与默认参数。</div>
-              </div>
-              <div class="rowRight"><button class="btn btnGhost" type="button" data-goto="workbench">进入工作台</button></div>
-            </div>
-            <div class="row">
-              <div class="rowMain">
-                <div class="rowTitle">从模板创建</div>
-                <div class="rowDesc">黑板 / 实验室 / 宇宙 / 雨夜 氛围模板。</div>
-              </div>
-              <div class="rowRight"><button class="btn btnGhost" type="button">选择模板</button></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  `;
-
-  shell.viewRoot.querySelectorAll("[data-open-project]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      appState.activeProjectId = btn.dataset.openProject;
-      location.hash = "#/workbench";
-    });
-  });
-  shell.viewRoot.querySelectorAll("[data-goto]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      location.hash = `#/${btn.dataset.goto}`;
-    });
-  });
-}
+// assets/projects 已迁移到 features 模块
 
 function renderRenderPage() {
-  setHeader("渲染中心", "任务队列 / 状态 / 日志（原型）");
+  applyHeader(shell, "render");
   const items = RENDER_JOBS.map((j) => {
     const status = j.status === "success" ? "ok" : j.status === "running" ? "run" : "fail";
     return `
@@ -183,7 +77,7 @@ function renderRenderPage() {
 }
 
 function renderBranchesPage() {
-  setHeader("版本/分枝", "版本对比 / 分枝跳转（原型）");
+  applyHeader(shell, "branches");
   const items = VERSIONS.filter((v) => v.projectId === appState.activeProjectId).map((v) => {
     return `
       <div class="row">
@@ -239,7 +133,7 @@ function renderBranchesPage() {
 }
 
 function renderExportPage() {
-  setHeader("导出/发布", "导出 mp4 / 工程包 / 分享（原型）");
+  applyHeader(shell, "export");
   shell.viewRoot.innerHTML = `
     <section class="page">
       <div class="grid2">
@@ -287,7 +181,7 @@ function renderExportPage() {
 }
 
 function renderSettingsPage() {
-  setHeader("设置", "网关 / 模型 / 预设（原型占位）");
+  applyHeader(shell, "settings");
   shell.viewRoot.innerHTML = `
     <section class="page">
       <div class="grid2">
@@ -335,7 +229,7 @@ function renderSettingsPage() {
 }
 
 function renderMePage() {
-  setHeader("个人中心", "账号信息 / 偏好 / 用量（原型占位）");
+  applyHeader(shell, "me");
   shell.viewRoot.innerHTML = `
     <section class="page">
       <div class="grid2">
@@ -850,7 +744,7 @@ function wireWorkbenchEvents() {
 }
 
 function renderWorkbenchPage() {
-  setHeader("工作台", "输入意图 → 生成分镜 → 调参 → 提交渲染 → 预览/分枝 → 导出");
+  applyHeader(shell, "workbench");
   shell.viewRoot.innerHTML = workbenchTemplate();
   initWorkbench();
 }
@@ -859,8 +753,9 @@ function renderRoute(route) {
   workbench = null;
   appState.route = route;
   setNavActive(route);
+  applyHeader(shell, route);
 
-  if (route === "projects") return renderProjectsPage();
+  if (route === "projects") return renderProjectsPage({ shell, appState });
   if (route === "render") return renderRenderPage();
   if (route === "branches") return renderBranchesPage();
   if (route === "export") return renderExportPage();
@@ -875,12 +770,12 @@ function onRouteChange() {
 }
 
 function init() {
-  renderAssets();
-  shell.toggleAssets.addEventListener("click", () => openAssets(true));
-  shell.closeAssets.addEventListener("click", () => openAssets(false));
+  renderAssets(shell);
+  shell.toggleAssets.addEventListener("click", () => openAssets(shell, true));
+  shell.closeAssets.addEventListener("click", () => openAssets(shell, false));
 
   window.addEventListener("hashchange", onRouteChange);
-  if (!location.hash) location.hash = "#/workbench";
+  ensureHashRoute();
   onRouteChange();
 }
 

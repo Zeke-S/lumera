@@ -1,0 +1,18 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: #06080d;
+  --color-foreground: #e9edf6;
+  --color-primary: #7cffcb;
+  --color-primary-foreground: #0b1020;
+  --color-secondary: rgba(255, 255, 255, 0.06);
+  --color-secondary-foreground: #e9edf6;
+  --color-accent: rgba(124, 182, 255, 0.16);
+  --color-accent-foreground: #e9edf6;
+  --color-ring: rgba(124, 255, 203, 0.45);
+}
+
+/* 临时：复用现有原型的视觉规范，确保迁移到 Next 后视觉一致。
+   后续会逐步用 Tailwind/shadcn 的 token 与组件替换掉这份 legacy CSS。 */
+@import "../../../styles.css";
+
