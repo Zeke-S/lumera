@@ -16,3 +16,202 @@
    后续会逐步用 Tailwind/shadcn 的 token 与组件替换掉这份 legacy CSS。 */
 @import "../../../styles.css";
 
+/* 让视觉“明显变化”的第一步：
+   在 Next 版中，用新的 token 覆盖 legacy 的按钮体系（不需要先重写全部 DOM/React 结构）。 */
+.btn{
+  border: 1px solid color-mix(in oklab, var(--color-ring) 28%, transparent);
+  background: color-mix(in oklab, var(--color-secondary) 85%, transparent);
+  color: var(--color-foreground);
+  padding: 10px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 150ms ease, border-color 150ms ease, background 150ms ease, box-shadow 150ms ease;
+  user-select: none;
+}
+.btn:hover{
+  transform: translateY(-1px);
+  border-color: color-mix(in oklab, var(--color-ring) 55%, transparent);
+  background: color-mix(in oklab, var(--color-secondary) 70%, transparent);
+  box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+.btn:active{ transform: translateY(0px); }
+
+.btnGhost{
+  background: transparent;
+  border-color: color-mix(in oklab, white 12%, transparent);
+}
+.btnGhost:hover{
+  background: color-mix(in oklab, var(--color-accent) 45%, transparent);
+  border-color: color-mix(in oklab, var(--color-accent) 75%, transparent);
+}
+
+.btnPrimary{
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-primary) 35%, transparent),
+    color-mix(in oklab, var(--color-accent) 18%, transparent)
+  );
+  border-color: color-mix(in oklab, var(--color-primary) 55%, transparent);
+  color: var(--color-foreground);
+}
+.btnPrimary:hover{
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-primary) 45%, transparent),
+    color-mix(in oklab, var(--color-accent) 22%, transparent)
+  );
+  border-color: color-mix(in oklab, var(--color-primary) 70%, transparent);
+}
+
+/* 第二步：全局交互一致性（focus ring / selection） */
+::selection{
+  background: color-mix(in oklab, var(--color-primary) 35%, transparent);
+  color: var(--color-foreground);
+}
+.btn:focus-visible,
+.navItem:focus-visible,
+.paramInput:focus-visible,
+.paramSelect:focus-visible,
+.omnibarInput:focus-visible{
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--color-ring) 55%, transparent);
+  border-color: color-mix(in oklab, var(--color-ring) 65%, transparent);
+}
+
+/* 第三步：壳层（sidebar/topbar/nav） */
+.sidebar{
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, #0b1020 85%, transparent),
+    color-mix(in oklab, #06080d 65%, transparent)
+  );
+  border-right: 1px solid color-mix(in oklab, white 7%, transparent);
+}
+.sidebarBrand{
+  border-color: color-mix(in oklab, white 10%, transparent);
+  background: color-mix(in oklab, white 2.5%, transparent);
+}
+.topbar{
+  border-bottom: 1px solid color-mix(in oklab, white 7%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, #0b1020 78%, transparent),
+    color-mix(in oklab, #06080d 45%, transparent)
+  );
+}
+.pageTitle{ letter-spacing: .1px; }
+.pageSubtitle{ color: color-mix(in oklab, var(--color-foreground) 70%, transparent); }
+.nav{
+  gap: 8px;
+  padding: 6px;
+}
+.navItem{
+  border-radius: 12px;
+  border-color: transparent;
+  background: transparent;
+}
+.navItem:hover{
+  background: color-mix(in oklab, var(--color-accent) 28%, transparent);
+  border-color: color-mix(in oklab, var(--color-accent) 45%, transparent);
+}
+.navItem.active{
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--color-primary) 18%, transparent),
+    color-mix(in oklab, var(--color-accent) 16%, transparent)
+  );
+  border-color: color-mix(in oklab, var(--color-primary) 28%, transparent);
+}
+
+/* 第四步：面板/列表体系（panel/dockCard/row/status/card） */
+.panel,
+.dockCard,
+.assetsDrawer,
+.branchingMap,
+.modalCard{
+  border-color: color-mix(in oklab, white 9%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, #0b1020 66%, transparent),
+    color-mix(in oklab, #06080d 52%, transparent)
+  );
+}
+.panel,
+.dockCard{
+  box-shadow: 0 18px 70px rgba(0,0,0,.38);
+}
+.row,
+.treeNode,
+.branchItem,
+.assetItem{
+  border-color: color-mix(in oklab, white 9%, transparent);
+  background: color-mix(in oklab, white 3%, transparent);
+}
+.row:hover,
+.treeNode:hover,
+.branchItem:hover{
+  border-color: color-mix(in oklab, var(--color-accent) 50%, transparent);
+  background: color-mix(in oklab, var(--color-accent) 16%, transparent);
+}
+.rowDesc,
+.panelHint,
+.smallMuted,
+.assetMeta,
+.treeMeta,
+.branchDesc{
+  color: color-mix(in oklab, var(--color-foreground) 72%, transparent);
+}
+.status{
+  border-color: color-mix(in oklab, white 14%, transparent);
+  background: color-mix(in oklab, white 5%, transparent);
+  color: color-mix(in oklab, var(--color-foreground) 78%, transparent);
+}
+.status.ok{ border-color: color-mix(in oklab, var(--color-primary) 32%, transparent); }
+.status.run{ border-color: color-mix(in oklab, var(--color-accent) 40%, transparent); }
+.status.fail{ border-color: color-mix(in oklab, #ffcc7c 40%, transparent); }
+
+/* 第五步：输入控件（omnibar/param inputs） */
+.omnibar{
+  border-color: color-mix(in oklab, white 10%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, #0b1020 72%, transparent),
+    color-mix(in oklab, #06080d 58%, transparent)
+  );
+  box-shadow: 0 18px 70px rgba(0,0,0,.42);
+}
+.omnibarInput::placeholder{
+  color: color-mix(in oklab, var(--color-foreground) 55%, transparent);
+}
+.paramInput,
+.paramSelect{
+  border-color: color-mix(in oklab, white 10%, transparent);
+  background: color-mix(in oklab, white 3%, transparent);
+}
+.paramInput:hover,
+.paramSelect:hover{
+  border-color: color-mix(in oklab, var(--color-accent) 50%, transparent);
+}
+
+/* 第六步：覆盖卡片（overlay cards）更“设计系统” */
+.card{
+  border-color: color-mix(in oklab, white 10%, transparent);
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, #0b1020 74%, transparent),
+    color-mix(in oklab, #06080d 56%, transparent)
+  );
+}
+.badge{
+  border-color: color-mix(in oklab, white 14%, transparent);
+  background: color-mix(in oklab, white 5%, transparent);
+}
+.tag{
+  border-color: color-mix(in oklab, var(--color-accent) 35%, transparent);
+  background: color-mix(in oklab, var(--color-accent) 14%, transparent);
+}
+.tag.logic{
+  border-color: color-mix(in oklab, var(--color-primary) 35%, transparent);
+  background: color-mix(in oklab, var(--color-primary) 14%, transparent);
+}
+
